@@ -3,6 +3,9 @@
 -- Run this ONLY if you have NOT already run schema_rooms.sql
 -- (schema_rooms.sql already creates this table).
 -- If you already ran schema_rooms.sql, skip this file.
+--
+-- IMPORTANT: Only run ONE of these schema files, NOT BOTH.
+-- Running both can create duplicate/conflicting RLS policies.
 -- ============================================================
 
 -- Allow users to mark their own notifications as read
