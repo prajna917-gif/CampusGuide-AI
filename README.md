@@ -30,9 +30,13 @@ campus-guide-auth/
    turn **Enable email provider** ON and **Confirm email** OFF (for development). Save.
 2. **SQL Editor -> New query**: paste `supabase/schema.sql` and **Run**
    (skip if you already ran it - running it twice gives "already exists").
-3. **Project Settings -> API**: copy the **Project URL** and the **anon / publishable key**.
-4. Copy `.env.example` to `.env` and paste the two values.
-5. Install and run (Node.js 18 or newer):
+3. To enable admin announcements, run `supabase/schema_notifications.sql` in the
+   SQL Editor after `schema.sql`. This creates the notifications table and its
+   access policies; it is safe to run even if `schema_rooms.sql` already created
+   the table.
+4. **Project Settings -> API**: copy the **Project URL** and the **anon / publishable key**.
+5. Copy `.env.example` to `.env` and paste the two values.
+6. Install and run (Node.js 18 or newer):
 
 ```
 npm install

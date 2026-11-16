@@ -1,23 +1,55 @@
 -- ============================================================
 -- NOTIFICATIONS TABLE + RLS
--- Run this ONLY if you have NOT already run schema_rooms.sql
--- (schema_rooms.sql already creates this table).
--- If you already ran schema_rooms.sql, skip this file.
+-- Run supabase/schema.sql first, then run this file in the Supabase SQL Editor.
+-- schema_rooms.sql also creates this table; this file is safe to run afterward.
 --
--- IMPORTANT: Only run ONE of these schema files, NOT BOTH.
--- Running both can create duplicate/conflicting RLS policies.
+-- This migration intentionally uses idempotent table, index, and policy
+-- statements so it can also repair projects where the table was never created.
 -- ============================================================
 
--- Allow users to mark their own notifications as read
-create policy if not exists "users update own notifications" on public.notifications
+create table if not exists public.notifications (
+  id uuid primary key default gen_random_uuid(),
+  user_id uuid references auth.users(id) on delete cascade,
+  role text check (role in ('student', 'faculty', 'admin')),
+  title text not null,
+  message text not null,
+  type text default 'info'
+    check (type in ('info', 'warning', 'success', 'error', 'room_change')),
+  is_read boolean default false,
+  created_at timestamptz default now()
+);
+
+alter table public.notifications enable row level security;
+
+drop policy if exists "notifications read own" on public.notifications;
+create policy "notifications read own" on public.notifications
+  for select using (
+    user_id = auth.uid()
+    or (
+      user_id is null
+      and (
+        role is null
+        or role = (select role from public.profiles where id = auth.uid())
+      )
+    )
+  );
+
+drop policy if exists "users update own notifications" on public.notifications;
+create policy "users update own notifications" on public.notifications
   for update
   using (user_id = auth.uid())
   with check (user_id = auth.uid());
 
--- Allow admins to insert notifications
-create policy if not exists "admin insert notifications" on public.notifications
-  for insert
+drop policy if exists "admin manage notifications" on public.notifications;
+create policy "admin manage notifications" on public.notifications
+  for all
+  using (public.my_role() = 'admin')
   with check (public.my_role() = 'admin');
+
+create index if not exists idx_notifications_user
+  on public.notifications(user_id, is_read, created_at desc);
+
+notify pgrst, 'reload schema';
 
 -- ============================================================
 -- SAMPLE SEED NOTIFICATIONS (optional, for testing)

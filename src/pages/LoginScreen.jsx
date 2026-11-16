@@ -140,7 +140,7 @@ export default function LoginScreen() {
           <div className="input-group-custom">
             <label>Role</label>
             <div className="role-segmented">
-              {["student", "faculty", "admin"].map((r) => (
+              {["student", "faculty"].map((r) => (
                 <button
                   key={r}
                   type="button"
@@ -148,7 +148,7 @@ export default function LoginScreen() {
                   onClick={() => setRole(r)}
                   disabled={busy}
                 >
-                  {r === "student" ? "Student" : r === "faculty" ? "Faculty" : "Admin"}
+                  {r === "student" ? "Student" : "Faculty"}
                 </button>
               ))}
             </div>
@@ -190,6 +190,18 @@ export default function LoginScreen() {
               <path d="M12.24,0c6.37,0,11.52,5.15,11.52,11.52S18.62,23.04,12.24,23.04,0.72,17.89,0.72,11.52,5.87,0,12.24,0z M7.22,12.97h2.2V9.1h2.77v3.87h2.2v2.8h-2.2v3.87h-2.77v-3.87H7.22V12.97z"/>
             </svg>
             <span>Microsoft</span>
+          </button>
+          <button
+            type="button"
+            className="social-btn github"
+            onClick={() => handleSocialLogin("github")}
+            disabled={busy}
+            aria-label="Sign in with GitHub"
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M12 .5C5.73.5.75 5.48.75 11.75c0 4.98 3.23 9.2 7.71 10.69.56.1.77-.24.77-.54v-2.1c-3.14.68-3.8-1.34-3.8-1.34-.51-1.3-1.25-1.65-1.25-1.65-1.02-.7.08-.69.08-.69 1.13.08 1.73 1.16 1.73 1.16 1 .1 2.4-.36 3.06-1.12.1-.75.39-1.26.71-1.55-2.51-.29-5.15-1.26-5.15-5.6 0-1.24.44-2.25 1.16-3.04-.12-.29-.5-1.43.11-2.98 0 0 .95-.3 3.1 1.16a10.8 10.8 0 0 1 2.83-.38c.96 0 1.93.13 2.83.38 2.15-1.46 3.09-1.16 3.09-1.16.61 1.55.23 2.69.11 2.98.72.79 1.16 1.8 1.16 3.04 0 4.35-2.65 5.31-5.17 5.59.4.35.76 1.03.76 2.08v3.09c0 .3.2.65.78.54 4.48-1.49 7.7-5.71 7.7-10.69C23.25 5.48 18.27.5 12 .5z"/>
+            </svg>
+            <span>GitHub</span>
           </button>
         </div>
 

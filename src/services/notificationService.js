@@ -160,38 +160,24 @@ export async function markAllAsRead() {
  * @param {string|null} [opts.userId]  - null = broadcast to role
  */
 export async function postNotification({ title, message, type = "info", role = null, userId = null }) {
-  try {
-    const { data, error } = await supabase
-      .from("notifications")
-      .insert({ title, message, type, role, user_id: userId })
-      .select();
+  const { data, error } = await supabase
+    .from("notifications")
+    .insert({ title, message, type, role, user_id: userId })
+    .select();
 
-    if (error) {
-      const hint =
-        error.message.includes("row-level security")
-          ? "\n\nRLS blocked the insert — check: the admin user must have a row in public.profiles with role = 'admin' (my_role() must return 'admin'). Additionally, ensure only ONE schema file was run (schema_rooms.sql OR schema_notifications.sql, not both)."
-          : "";
-      throw new Error(error.message + hint);
-    }
-
-    return data?.[0] ?? null;
-  } catch (err) {
-    const local = getLocalNotifications();
-    const newNotif = {
-      id: "local-" + Date.now(),
-      user_id: userId,
-      role,
-      title,
-      message,
-      type,
-      related_room_id: null,
-      related_allocation_id: null,
-      is_read: false,
-      created_at: new Date().toISOString(),
-    };
-    setLocalNotifications([newNotif, ...local]);
-    return newNotif;
+  if (error) {
+    const hint = error.message.includes("row-level security")
+      ? "\n\nRLS blocked the insert — check that the admin user has role = 'admin' in public.profiles."
+      : error.message.includes("Could not find the table")
+        ? "\n\nRun supabase/schema_notifications.sql in the Supabase SQL Editor after supabase/schema.sql."
+        : "";
+    throw new Error(error.message + hint);
   }
+
+  if (!data?.[0]) {
+    throw new Error("Supabase did not return the saved notification.");
+  }
+  return data[0];
 }
 
 // ─── RELATIVE TIME HELPER ─────────────────────────────────────────────────────

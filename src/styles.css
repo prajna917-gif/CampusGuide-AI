@@ -1586,6 +1586,11 @@ ul { margin: 0; padding-left: 20px; line-height: 1.8; }
   color: #0078D4;
 }
 
+.social-btn.github:hover:not(:disabled) {
+  border-color: #24292f;
+  color: #24292f;
+}
+
 @media (max-width: 768px) {
   .login-container {
     flex-direction: column;
