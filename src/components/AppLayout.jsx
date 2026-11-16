@@ -1,217 +1,175 @@
-import { useState, useEffect } from "react";
-import { Link, useLocation } from "react-router-dom";
+﻿import { useState, useEffect } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import InstallPwaPrompt from "./InstallPwaPrompt";
-import ChatWidget from "./ChatWidget";
 import { getUnreadCount } from "../services/notificationService";
 
-export default function AppLayout({ children, title, subtitle }) {
+const Icon = ({ name, size = 22 }) => {
+  const p = { width: size, height: size, viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "1.8", strokeLinecap: "round", strokeLinejoin: "round" };
+  const icons = {
+    menu: <svg {...p}><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>,
+    close: <svg {...p}><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>,
+    collapse: <svg {...p}><polyline points="11 17 6 12 11 7"/><polyline points="18 17 13 12 18 7"/></svg>,
+    search: <svg {...p}><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>,
+    bell: <svg {...p}><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>,
+    chat: <svg {...p}><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>,
+    home: <svg {...p}><path d="M3 10.5L12 3l9 7.5"/><path d="M5 9.5V20h14V9.5"/><path d="M9 20v-6h6v6"/></svg>,
+    map: <svg {...p}><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg>,
+    pin: <svg {...p}><path d="M12 21s-7-6.2-7-11a7 7 0 1 1 14 0c0 4.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>,
+    calendar: <svg {...p}><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>,
+    users: <svg {...p}><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>,
+    lab: <svg {...p}><path d="M10 2v7.5L5.5 19A2 2 0 0 0 7.3 22h9.4a2 2 0 0 0 1.8-3L14 9.5V2"/><line x1="8" y1="2" x2="16" y2="2"/></svg>,
+    alert: <svg {...p}><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>,
+    spark: <svg {...p}><path d="M12 2l2.2 5.8L20 10l-5.8 2.2L12 18l-2.2-5.8L4 10l5.8-2.2z"/></svg>,
+    folder: <svg {...p}><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>,
+    clock: <svg {...p}><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/></svg>,
+    chevronDown: <svg {...p}><polyline points="6 9 12 15 18 9"/></svg>,
+    arrow: <svg {...p}><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>,
+    plus: <svg {...p}><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>,
+    bookmark: <svg {...p}><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>,
+    compass: <svg {...p}><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>,
+    myclass: <svg {...p}><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>,
+  };
+  return icons[name] || null;
+};
+
+export default function AppLayout({ children, title, subtitle, hideBottomNav = false }) {
   const { profile, logout } = useAuth();
   const location = useLocation();
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const navigate = useNavigate();
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [activityOpen, setActivityOpen] = useState(false);
+  const [viewAs, setViewAs] = useState(profile?.role || "student");
+  const [unread, setUnread] = useState(0);
 
   const role = profile?.role || "student";
+  const allowedRoles = role === "admin" ? ["student", "faculty", "admin"] : role === "faculty" ? ["student", "faculty"] : ["student"];
+  const displayName = profile?.name || "User";
 
-  const [unreadCount, setUnreadCount] = useState(0);
-
+  useEffect(() => { setViewAs(role); }, [role]);
   useEffect(() => {
     let cancelled = false;
-    getUnreadCount().then((count) => { if (!cancelled) setUnreadCount(count || 0); });
+    getUnreadCount().then((c) => { if (!cancelled) setUnread(c || 0); }).catch(() => {});
     return () => { cancelled = true; };
   }, [location.pathname]);
+  useEffect(() => { setDrawerOpen(false); }, [location.pathname]);
 
-  // Navigation Links based on user role
-  const navConfigs = {
-    student: [
-      { label: "Dashboard", path: "/student", icon: "📊" },
-      { label: "Timetable", path: "/student/timetable", icon: "📅" },
-      { label: "Find Classroom", path: "/find-classroom", icon: "🔍" },
-      { label: "Map & Navigation", path: "/map", icon: "🗺️" },
-      { label: "Notifications", path: "/notifications", icon: "🔔" },
-      { label: "Events", path: "/events", icon: "🎉" },
-      { label: "AI Assistant", path: "/chat", icon: "🤖" },
-      { label: "Profile", path: "/profile", icon: "👤" },
-      { label: "Settings", path: "/settings", icon: "⚙️" },
-    ],
-    faculty: [
-      { label: "Dashboard", path: "/faculty", icon: "📊" },
-      { label: "Timetable", path: "/faculty/timetable", icon: "📅" },
-      { label: "Find Classroom", path: "/find-classroom", icon: "🔍" },
-      { label: "Map & Navigation", path: "/map", icon: "🗺️" },
-      { label: "Notifications", path: "/notifications", icon: "🔔" },
-      { label: "Events", path: "/events", icon: "🎉" },
-      { label: "Request Change", path: "/faculty/request-change", icon: "🔄" },
-      { label: "AI Assistant", path: "/chat", icon: "🤖" },
-      { label: "Profile", path: "/profile", icon: "👤" },
-      { label: "Settings", path: "/settings", icon: "⚙️" },
-    ],
-    admin: [
-      { label: "Dashboard", path: "/admin", icon: "📊" },
-      { label: "Timetable", path: "/student/timetable", icon: "📅" },
-      { label: "Find Classroom", path: "/find-classroom", icon: "🔍" },
-      { label: "Map & Navigation", path: "/map", icon: "🗺️" },
-      { label: "Notifications", path: "/notifications", icon: "🔔" },
-      { label: "Manage Notifications", path: "/admin/notifications", icon: "📢" },
-      { label: "Events", path: "/events", icon: "🎉" },
-      { label: "Manage Events", path: "/admin/events", icon: "📅" },
-      { label: "AI Assistant", path: "/chat", icon: "🤖" },
-      { label: "Profile", path: "/profile", icon: "👤" },
-      { label: "Settings", path: "/settings", icon: "⚙️" },
-    ],
-  };
+  const menu = [
+    { label: "Home", path: "/home", icon: "home" },
+    { label: "Campus Map", path: "/map", icon: "map" },
+    { label: "Find Classroom", path: "/find-classroom", icon: "pin" },
+    { label: "My Timetable", path: role === "faculty" ? "/faculty/timetable" : "/student/timetable", icon: "calendar" },
+    { label: "Faculty Directory", path: "/profile", icon: "users" },
+    { label: "Labs & Departments", path: "/map", icon: "lab" },
+    { label: "Room Shift Alerts", path: "/notifications", icon: "alert" },
+    { label: "AI Guide", path: "/chat", icon: "spark" },
+  ];
 
-  const navItems = navConfigs[role] || navConfigs.student;
+  const bottomTabs = [
+    { label: "My Class", path: role === "faculty" ? "/faculty/timetable" : "/student/timetable", icon: "myclass" },
+    { label: "Explore Map", path: "/map", icon: "compass" },
+    { label: "Saved", path: "/saved", icon: "bookmark" },
+  ];
 
-  // Mobile Bottom Nav items (4 primary tabs, same paths as before)
-  const mobileTabs = {
-    student: [
-      { label: "Dashboard", path: "/student", icon: "📊" },
-      { label: "Timetable", path: "/student/timetable", icon: "📅" },
-      { label: "Navigation", path: "/student/map", icon: "🗺️" },
-      { label: "Profile", path: "/profile", icon: "👤" },
-    ],
-    faculty: [
-      { label: "Dashboard", path: "/faculty", icon: "📊" },
-      { label: "Timetable", path: "/faculty/timetable", icon: "📅" },
-      { label: "Navigation", path: "/student/map", icon: "🗺️" },
-      { label: "Profile", path: "/profile", icon: "👤" },
-    ],
-    admin: [
-      { label: "Dashboard", path: "/admin", icon: "📊" },
-      { label: "Timetable", path: "/student/timetable", icon: "📅" },
-      { label: "Navigation", path: "/student/map", icon: "🗺️" },
-      { label: "Profile", path: "/profile", icon: "👤" },
-    ],
-  };
-
-  const currentMobileTabs = mobileTabs[role] || mobileTabs.student;
-
-
-  const displayName = profile?.name || (role === "faculty" ? "Dr. Sneha" : role === "student" ? "Manya" : "Admin");
+  const isActive = (p) => location.pathname === p;
 
   return (
-    <div className="admin-shell">
-      {/* Mobile Drawer Backdrop */}
-      {sidebarOpen && (
-        <div className="admin-backdrop" onClick={() => setSidebarOpen(false)} />
-      )}
+    <div className="cg-shell">
+      {drawerOpen && <div className="cg-drawer-backdrop" onClick={() => setDrawerOpen(false)} />}
 
-      {/* Unified Sidebar (Matches Mockups 2, 3, 5, 7, 8) */}
-      <aside className={`admin-sidebar ${sidebarOpen ? "open" : ""}`}>
-        <div className="sidebar-brand">
-          <div className="brand-icon-box">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
-            </svg>
-          </div>
-          <div className="brand-text">
-            <h2>CampusGuide</h2>
-            <p>Smart Indoor Navigation</p>
+      <aside className={`cg-drawer ${drawerOpen ? "open" : ""}`}>
+        <div className="cg-drawer-top">
+          <button className="cg-icon-btn" onClick={() => setDrawerOpen(false)} aria-label="Collapse"><Icon name="collapse" /></button>
+        </div>
+
+        <div className="cg-viewas-card">
+          <div className="cg-viewas-label">You're viewing as</div>
+          <div className="cg-select-wrap">
+            <select value={viewAs} onChange={(e) => setViewAs(e.target.value)} className="cg-select">
+              {allowedRoles.map((r) => <option key={r} value={r}>{r.charAt(0).toUpperCase() + r.slice(1)}</option>)}
+            </select>
+            <span className="cg-select-caret"><Icon name="chevronDown" size={16} /></span>
           </div>
         </div>
 
-        <nav className="sidebar-nav">
-          {navItems.map((item, idx) => {
-            const isActive = location.pathname === item.path;
-            const isNotifications = item.path === "/notifications";
-            return (
-              <Link
-                key={idx}
-                to={item.path}
-                className={`sidebar-link ${isActive ? "active" : ""}`}
-                onClick={() => setSidebarOpen(false)}
-              >
-                <span className="nav-icon">
-                  {item.icon}
-                  {isNotifications && unreadCount > 0 && (
-                    <span className="nav-badge">{unreadCount > 9 ? "9+" : unreadCount}</span>
-                  )}
-                </span>
-                <span className="nav-label">{item.label}</span>
-              </Link>
-            );
-          })}
+        {(role === "admin") && (
+          <button className="cg-update-room-btn" onClick={() => navigate("/admin/classrooms")}>
+            <span className="cg-plus"><Icon name="plus" size={18} /></span> Update Room
+          </button>
+        )}
+
+        <nav className="cg-drawer-nav">
+          {menu.map((item) => (
+            <Link key={item.label} to={item.path} className={`cg-drawer-item ${isActive(item.path) ? "active" : ""}`}>
+              <span className="cg-drawer-icon"><Icon name={item.icon} /></span>
+              <span>{item.label}</span>
+            </Link>
+          ))}
+          <button className={`cg-drawer-item cg-drawer-collapse ${activityOpen ? "open" : ""}`} onClick={() => setActivityOpen((v) => !v)}>
+            <span className="cg-drawer-icon"><Icon name="folder" /></span>
+            <span>My Activity</span>
+            <span className="cg-chevron"><Icon name="chevronDown" size={16} /></span>
+          </button>
+          {activityOpen && (
+            <div className="cg-drawer-sub">
+              <Link to="/saved" className="cg-drawer-subitem"><Icon name="bookmark" size={16} /> Saved Rooms</Link>
+              <Link to="/explore" className="cg-drawer-subitem"><Icon name="clock" size={16} /> Recent Searches</Link>
+            </div>
+          )}
         </nav>
 
-        <div className="sidebar-footer">
+        <div className="cg-drawer-bottom">
           <InstallPwaPrompt />
-          <button className="sidebar-logout-btn" onClick={logout}>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
-              <polyline points="16 17 21 12 16 7" />
-              <line x1="21" y1="12" x2="9" y2="12" />
-            </svg>
-            <span>Logout</span>
-          </button>
+          {role === "admin" && (
+            <Link to="/admin" className="cg-admin-banner">
+              <span>Admin Panel</span>
+              <span className="cg-admin-arrow"><Icon name="arrow" size={18} /></span>
+            </Link>
+          )}
+          <button className="cg-logout-link" onClick={logout}>Log out</button>
         </div>
       </aside>
 
-      {/* Main Page Area */}
-      <div className="admin-main">
-        {/* Header Bar */}
-        <header className="admin-header">
-          <div className="header-left">
-            <button
-              className="menu-toggle-btn"
-              onClick={() => setSidebarOpen(!sidebarOpen)}
-              aria-label="Toggle menu"
-            >
-              <svg width="22" height="22" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2" fill="none">
-                <line x1="3" y1="12" x2="21" y2="12" />
-                <line x1="3" y1="6" x2="21" y2="6" />
-                <line x1="3" y1="18" x2="21" y2="18" />
-              </svg>
-            </button>
-
-            {(title || subtitle) && (
-              <div className="header-title-block">
-                {title && <h1 className="header-title">{title}</h1>}
-                {subtitle && <p className="header-subtitle">{subtitle}</p>}
-              </div>
-            )}
-          </div>
-
-          <div className="header-right">
-            <Link to="/profile" className="admin-user-pill">
-              <div className="admin-avatar">
-                {profile?.avatar_url
-                  ? <img src={profile.avatar_url} alt="avatar" className="admin-avatar-photo" />
-                  : displayName.charAt(0).toUpperCase()
-                }
-              </div>
-              <div className="admin-user-info">
-                <span className="user-name">{displayName}</span>
-              </div>
+      <div className="cg-main">
+        <header className="cg-topbar">
+          <button className="cg-icon-btn" onClick={() => setDrawerOpen(true)} aria-label="Menu"><Icon name="menu" /></button>
+          <Link to="/home" className="cg-brand">
+            <span className="cg-brand-pin"><Icon name="pin" size={18} /></span>
+            <span className="cg-brand-text">CampusGuide <span className="cg-brand-ai">AI</span></span>
+          </Link>
+          <div className="cg-top-actions">
+            <Link to="/explore" className="cg-icon-btn" aria-label="Search"><Icon name="search" /></Link>
+            <Link to="/notifications" className="cg-icon-btn cg-badge-wrap" aria-label="Notifications">
+              <Icon name="bell" />
+              {unread > 0 && <span className="cg-badge">{unread > 9 ? "9+" : unread}</span>}
+            </Link>
+            <Link to="/chat" className="cg-icon-btn" aria-label="AI Guide"><Icon name="chat" /></Link>
+            <Link to="/profile" className="cg-avatar" aria-label="Profile">
+              {profile?.avatar_url ? <img src={profile.avatar_url} alt="" /> : displayName.charAt(0).toUpperCase()}
             </Link>
           </div>
         </header>
 
-
-        {/* Main Content */}
-        <main className="admin-content with-bottom-nav">
+        <main className={`cg-content ${hideBottomNav ? "" : "has-bottom-nav"}`}>
+          {(title || subtitle) && (
+            <div className="cg-page-head">
+              {title && <h1>{title}</h1>}
+              {subtitle && <p>{subtitle}</p>}
+            </div>
+          )}
           {children}
         </main>
 
-        {/* Mobile Bottom Navigation (4 tabs: Dashboard, Timetable, Navigation, Profile) */}
-        <nav className="mobile-bottom-nav">
-          {currentMobileTabs.map((tab, i) => {
-            const isActive = location.pathname === tab.path;
-            return (
-              <Link
-                key={i}
-                to={tab.path}
-                className={`bottom-nav-item ${isActive ? "active" : ""}`}
-              >
-                <span className="bottom-nav-icon">{tab.icon}</span>
-                <span className="bottom-nav-label">{tab.label}</span>
+        {!hideBottomNav && (
+          <nav className="cg-bottom-nav">
+            {bottomTabs.map((t) => (
+              <Link key={t.label} to={t.path} className={`cg-bottom-item ${isActive(t.path) ? "active" : ""}`}>
+                <span className="cg-bottom-icon"><Icon name={t.icon} size={20} /></span>
+                <span>{t.label}</span>
               </Link>
-            );
-          })}
-        </nav>
-
-        {/* Floating AI Assistant (available on every screen except the dedicated chat page) */}
-        {location.pathname !== "/chat" && <ChatWidget />}
-
+            ))}
+          </nav>
+        )}
       </div>
     </div>
   );

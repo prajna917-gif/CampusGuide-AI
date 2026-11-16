@@ -1,4 +1,4 @@
-import { Navigate, Route, Routes } from "react-router-dom";
+﻿import { Navigate, Route, Routes } from "react-router-dom";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Entry from "./pages/Entry";
 import Login from "./pages/LoginScreen";
@@ -18,6 +18,7 @@ import AIChat from "./pages/AIChat";
 import IndoorMap from "./pages/IndoorMap";
 import BuildingMap from "./pages/BuildingMap";
 import FindClassroom from "./pages/FindClassroom";
+import Explore from "./pages/Explore";
 import Notifications from "./pages/Notifications";
 import Events from "./pages/Events";
 import ManageNotifications from "./pages/ManageNotifications";
@@ -29,10 +30,7 @@ import Settings from "./pages/Settings";
 export default function App() {
   return (
     <Routes>
-      {/* First-launch flow */}
       <Route path="/" element={<Entry />} />
-
-      {/* Auth routes */}
       <Route path="/login" element={<Login />} />
       <Route path="/signup" element={<Signup />} />
       <Route path="/forgot-password" element={<ForgotPassword />} />
@@ -40,38 +38,33 @@ export default function App() {
       <Route path="/verify-email" element={<VerifyEmail />} />
       <Route path="/auth/callback" element={<AuthCallback />} />
 
-      {/* 2 & 3 & 4. Student Flow (Screens 2, 3, 4) */}
+      <Route path="/home" element={<ProtectedRoute allow={["student","faculty","admin"]}><StudentDashboard /></ProtectedRoute>} />
       <Route path="/student" element={<ProtectedRoute allow={["student"]}><StudentDashboard /></ProtectedRoute>} />
-      <Route path="/student/timetable" element={<ProtectedRoute allow={["student", "faculty"]}><Timetable /></ProtectedRoute>} />
-       <Route path="/student/map" element={<ProtectedRoute allow={["student", "faculty", "admin"]}><BuildingMap /></ProtectedRoute>} />
+      <Route path="/student/timetable" element={<ProtectedRoute allow={["student","faculty"]}><Timetable /></ProtectedRoute>} />
+      <Route path="/student/map" element={<ProtectedRoute allow={["student","faculty","admin"]}><BuildingMap /></ProtectedRoute>} />
 
-       {/* Find Classroom */}
-       <Route path="/map" element={<ProtectedRoute allow={["student", "faculty", "admin"]}><BuildingMap /></ProtectedRoute>} />
-       <Route path="/find-classroom" element={<ProtectedRoute allow={["student", "faculty", "admin"]}><FindClassroom /></ProtectedRoute>} />
-       <Route path="/notifications" element={<ProtectedRoute allow={["student", "faculty", "admin"]}><Notifications /></ProtectedRoute>} />
-       <Route path="/events" element={<ProtectedRoute allow={["student", "faculty", "admin"]}><Events /></ProtectedRoute>} />
+      <Route path="/explore" element={<ProtectedRoute allow={["student","faculty","admin"]}><Explore /></ProtectedRoute>} />
+      <Route path="/map" element={<ProtectedRoute allow={["student","faculty","admin"]}><BuildingMap /></ProtectedRoute>} />
+      <Route path="/find-classroom" element={<ProtectedRoute allow={["student","faculty","admin"]}><FindClassroom /></ProtectedRoute>} />
+      <Route path="/notifications" element={<ProtectedRoute allow={["student","faculty","admin"]}><Notifications /></ProtectedRoute>} />
+      <Route path="/events" element={<ProtectedRoute allow={["student","faculty","admin"]}><Events /></ProtectedRoute>} />
 
-       {/* 5 & 6. Faculty Flow (Screens 5, 6) */}
       <Route path="/faculty" element={<ProtectedRoute allow={["faculty"]}><FacultyDashboard /></ProtectedRoute>} />
       <Route path="/faculty/timetable" element={<ProtectedRoute allow={["faculty"]}><Timetable /></ProtectedRoute>} />
       <Route path="/faculty/request-change" element={<ProtectedRoute allow={["faculty"]}><RequestChange /></ProtectedRoute>} />
 
-      {/* 7 & 8. Admin Flow (Screens 7, 8) */}
       <Route path="/admin" element={<ProtectedRoute allow={["admin"]}><AdminDashboard /></ProtectedRoute>} />
       <Route path="/admin/classrooms" element={<ProtectedRoute allow={["admin"]}><ManageClassrooms /></ProtectedRoute>} />
-       <Route path="/admin/timetable" element={<ProtectedRoute allow={["admin"]}><ManageTimetable /></ProtectedRoute>} />
-       <Route path="/admin/notifications" element={<ProtectedRoute allow={["admin"]}><ManageNotifications /></ProtectedRoute>} />
-       <Route path="/admin/events" element={<ProtectedRoute allow={["admin"]}><ManageEvents /></ProtectedRoute>} />
-       <Route path="/admin/locations" element={<ProtectedRoute allow={["admin"]}><ManageLocations /></ProtectedRoute>} />
+      <Route path="/admin/timetable" element={<ProtectedRoute allow={["admin"]}><ManageTimetable /></ProtectedRoute>} />
+      <Route path="/admin/notifications" element={<ProtectedRoute allow={["admin"]}><ManageNotifications /></ProtectedRoute>} />
+      <Route path="/admin/events" element={<ProtectedRoute allow={["admin"]}><ManageEvents /></ProtectedRoute>} />
+      <Route path="/admin/locations" element={<ProtectedRoute allow={["admin"]}><ManageLocations /></ProtectedRoute>} />
 
-      {/* Shared Profile */}
-      <Route path="/profile" element={<ProtectedRoute allow={["student", "faculty", "admin"]}><Profile /></ProtectedRoute>} />
-      <Route path="/settings" element={<ProtectedRoute allow={["student", "faculty", "admin"]}><Settings /></ProtectedRoute>} />
+      <Route path="/profile" element={<ProtectedRoute allow={["student","faculty","admin"]}><Profile /></ProtectedRoute>} />
+      <Route path="/settings" element={<ProtectedRoute allow={["student","faculty","admin"]}><Settings /></ProtectedRoute>} />
+      <Route path="/chat" element={<ProtectedRoute allow={["student","faculty","admin"]}><AIChat /></ProtectedRoute>} />
+      <Route path="/saved" element={<ProtectedRoute allow={["student","faculty","admin"]}><Profile /></ProtectedRoute>} />
 
-      {/* Shared AI Assistant */}
-      <Route path="/chat" element={<ProtectedRoute allow={["student", "faculty", "admin"]}><AIChat /></ProtectedRoute>} />
-
-      {/* Fallback */}
       <Route path="*" element={<Navigate to="/login" replace />} />
     </Routes>
   );
