@@ -30,7 +30,23 @@ const Icon = ({ name, size = 22 }) => {
     bookmark: <svg {...p}><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>,
     compass: <svg {...p}><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>,
     myclass: <svg {...p}><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>,
-    qrcode: <svg {...p}><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="3" height="3"/><rect x="18" y="14" width="3" height="3"/><rect x="14" y="18" width="3" height="3"/><rect x="18" y="18" width="3" height="3"/></svg>,
+    qrcode: <svg {...p}>
+      {/* Corner brackets - viewfinder corners */}
+      <path d="M5 3h6M5 3v6" strokeWidth="2.5"/>
+      <path d="M19 3h-6M19 3v6" strokeWidth="2.5"/>
+      <path d="M5 21h6M5 21v-6" strokeWidth="2.5"/>
+      <path d="M19 21h-6M19 21v-6" strokeWidth="2.5"/>
+      {/* QR pattern - three finder patterns */}
+      <rect x="6" y="6" width="5" height="5" fill="currentColor" stroke="currentColor" strokeWidth="1"/>
+      <rect x="13" y="6" width="5" height="5" fill="currentColor" stroke="currentColor" strokeWidth="1"/>
+      <rect x="6" y="13" width="5" height="5" fill="currentColor" stroke="currentColor" strokeWidth="1"/>
+      {/* Inner dots */}
+      <rect x="7.5" y="7.5" width="2" height="2" fill="none"/>
+      <rect x="14.5" y="7.5" width="2" height="2" fill="none"/>
+      <rect x="7.5" y="14.5" width="2" height="2" fill="none"/>
+      {/* Center timing pattern dots */}
+      <circle cx="12" cy="12" r="1.5" fill="currentColor"/>
+    </svg>,
   };
   return icons[name] || null;
 };
@@ -72,7 +88,6 @@ export default function AppLayout({ children, title, subtitle, hideBottomNav = f
     { label: "My Class", path: role === "faculty" ? "/faculty/timetable" : "/student/timetable", icon: "myclass" },
     { label: "Explore Map", path: "/map", icon: "compass" },
     { label: "QR Scanner", action: "qr-scanner", icon: "qrcode" },
-    { label: "Saved", path: "/saved", icon: "bookmark" },
   ];
 
   const isActive = (p) => location.pathname === p;
@@ -180,7 +195,7 @@ export default function AppLayout({ children, title, subtitle, hideBottomNav = f
                 className={`cg-bottom-item ${t.path && isActive(t.path) ? "active" : ""}`}
                 onClick={() => handleBottomTab(t)}
               >
-                <span className="cg-bottom-icon"><Icon name={t.icon} size={20} /></span>
+                <span className="cg-bottom-icon"><Icon name={t.icon} size={22} /></span>
                 <span>{t.label}</span>
               </button>
             ))}

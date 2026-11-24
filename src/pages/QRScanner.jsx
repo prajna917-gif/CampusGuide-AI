@@ -97,9 +97,24 @@ export default function QRScannerPage({ onClose, onScanned }) {
             </div>
           ) : (
             <>
-              <video ref={videoRef} className="cg-qr-video" playsInline muted />
-              <div className="cg-qr-frame"></div>
-              <p className="cg-qr-hint">Point camera at a location QR code</p>
+              <div className="cg-qr-scanner-wrapper">
+                <video ref={videoRef} className="cg-qr-video" playsInline muted />
+                {/* Viewfinder overlay with corner brackets */}
+                <div className="cg-qr-viewfinder">
+                  <div className="cg-qr-corner cg-qr-corner-tl"></div>
+                  <div className="cg-qr-corner cg-qr-corner-tr"></div>
+                  <div className="cg-qr-corner cg-qr-corner-bl"></div>
+                  <div className="cg-qr-corner cg-qr-corner-br"></div>
+                  {/* QR pattern hint in center */}
+                  <div className="cg-qr-pattern-hint">
+                    <div className="cg-qr-finder cg-qr-finder-tl"></div>
+                    <div className="cg-qr-finder cg-qr-finder-tr"></div>
+                    <div className="cg-qr-finder cg-qr-finder-bl"></div>
+                    <div className="cg-qr-center-dot"></div>
+                  </div>
+                </div>
+              </div>
+              <p className="cg-qr-hint">Align the QR code within the frame</p>
             </>
           )}
         </div>
