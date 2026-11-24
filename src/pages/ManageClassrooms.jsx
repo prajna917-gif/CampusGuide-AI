@@ -1,11 +1,12 @@
 import { useState, useEffect } from "react";
 import AdminLayout from "../components/AdminLayout";
-import { 
-  getClassrooms, 
-  addClassroom, 
-  updateClassroom, 
-  deleteClassroom 
+import {
+  getClassrooms,
+  addClassroom,
+  updateClassroom,
+  deleteClassroom
 } from "../services/classroomService";
+import { generateQRForLocation } from "../utils/qrGenerator";
 
 export default function ManageClassrooms() {
   const [classrooms, setClassrooms] = useState([]);
@@ -27,6 +28,8 @@ export default function ManageClassrooms() {
 
   const [saving, setSaving] = useState(false);
   const [toast, setToast] = useState({ message: "", type: "" });
+  const [qrModal, setQrModal] = useState(null); // { dataUrl, roomNumber, label }
+  const [qrLoading, setQrLoading] = useState(false);
 
   useEffect(() => {
     loadClassrooms();
@@ -111,6 +114,31 @@ export default function ManageClassrooms() {
     } catch (err) {
       showToast("Failed to delete classroom", "error");
     }
+  }
+
+  async function handleShowQR(room) {
+    setQrLoading(true);
+    try {
+      const nodeId = `r_${room.room_number}`;
+      const qr = await generateQRForLocation(nodeId, `Room ${room.room_number}`, { sizeKey: "door_sticker" });
+      if (qr?.dataUrl) {
+        setQrModal({ dataUrl: qr.dataUrl, roomNumber: room.room_number, label: `Room ${room.room_number}`, url: qr.url });
+      } else {
+        showToast("Could not generate QR code", "error");
+      }
+    } catch (err) {
+      showToast("QR generation failed", "error");
+    } finally {
+      setQrLoading(false);
+    }
+  }
+
+  function downloadQR() {
+    if (!qrModal?.dataUrl) return;
+    const a = document.createElement("a");
+    a.href = qrModal.dataUrl;
+    a.download = `QR-Room-${qrModal.roomNumber}.png`;
+    a.click();
   }
 
   // Filtering
@@ -270,6 +298,23 @@ export default function ManageClassrooms() {
                       <td style={{ textAlign: "right" }}>
                         <div className="action-buttons">
                           <button 
+                            className="icon-action-btn qr-btn"
+                            title="Show QR Code"
+                            onClick={() => handleShowQR(room)}
+                            disabled={qrLoading}
+                          >
+                            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                              <rect x="3" y="3" width="7" height="7" rx="1" />
+                              <rect x="14" y="3" width="7" height="7" rx="1" />
+                              <rect x="3" y="14" width="7" height="7" rx="1" />
+                              <line x1="14" y1="14" x2="14" y2="17" />
+                              <line x1="17" y1="14" x2="21" y2="14" />
+                              <line x1="17" y1="17" x2="17" y2="21" />
+                              <line x1="21" y1="17" x2="21" y2="21" />
+                              <line x1="14" y1="21" x2="14" y2="21" />
+                            </svg>
+                          </button>
+                          <button 
                             className="icon-action-btn edit-btn"
                             title="Edit Classroom"
                             onClick={() => openEditModal(room)}
@@ -321,6 +366,20 @@ export default function ManageClassrooms() {
                     </div>
                   </div>
                   <div className="classroom-card-actions">
+                    <button 
+                      className="icon-action-btn qr-btn"
+                      title="Show QR Code"
+                      onClick={() => handleShowQR(room)}
+                      disabled={qrLoading}
+                    >
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <rect x="3" y="3" width="7" height="7" rx="1" />
+                        <rect x="14" y="3" width="7" height="7" rx="1" />
+                        <rect x="3" y="14" width="7" height="7" rx="1" />
+                        <line x1="14" y1="14" x2="14" y2="17" />
+                        <line x1="17" y1="14" x2="21" y2="14" />
+                      </svg>
+                    </button>
                     <button 
                       className="icon-action-btn edit-btn"
                       title="Edit Classroom"
@@ -435,6 +494,34 @@ export default function ManageClassrooms() {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* QR Code Modal */}
+      {qrModal && (
+        <div className="modal-overlay" onClick={() => setQrModal(null)}>
+          <div className="modal-dialog qr-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h3>QR Code — {qrModal.label}</h3>
+              <button className="modal-close-btn" onClick={() => setQrModal(null)}>✕</button>
+            </div>
+            <div className="modal-body" style={{ textAlign: "center" }}>
+              <img src={qrModal.dataUrl} alt={`QR code for ${qrModal.label}`} className="qr-modal-img" />
+              <p className="qr-modal-url">{qrModal.url}</p>
+              <p className="qr-modal-hint">Students scan this to get directions to this room.</p>
+            </div>
+            <div className="modal-footer" style={{ justifyContent: "center", gap: "10px" }}>
+              <button className="btn btn-primary" onClick={downloadQR}>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ verticalAlign: "middle", marginRight: "4px" }}>
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                  <polyline points="7 10 12 15 17 10" />
+                  <line x1="12" y1="15" x2="12" y2="3" />
+                </svg>
+                Download PNG
+              </button>
+              <button className="btn btn-outline" onClick={() => setQrModal(null)}>Close</button>
+            </div>
           </div>
         </div>
       )}

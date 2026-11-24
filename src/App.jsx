@@ -23,6 +23,9 @@ import Notifications from "./pages/Notifications";
 import Events from "./pages/Events";
 import ManageNotifications from "./pages/ManageNotifications";
 import ManageEvents from "./pages/ManageEvents";
+import QRGenerator from "./pages/QRGenerator";
+import ManageUsers from "./pages/ManageUsers";
+import ActivityLog from "./pages/ActivityLog";
 import RequestChange from "./pages/RequestChange";
 import Profile from "./pages/Profile";
 import Settings from "./pages/Settings";
@@ -56,9 +59,12 @@ export default function App() {
       <Route path="/admin" element={<ProtectedRoute allow={["admin"]}><AdminDashboard /></ProtectedRoute>} />
       <Route path="/admin/classrooms" element={<ProtectedRoute allow={["admin"]}><ManageClassrooms /></ProtectedRoute>} />
       <Route path="/admin/timetable" element={<ProtectedRoute allow={["admin"]}><ManageTimetable /></ProtectedRoute>} />
-      <Route path="/admin/notifications" element={<ProtectedRoute allow={["admin"]}><ManageNotifications /></ProtectedRoute>} />
-      <Route path="/admin/events" element={<ProtectedRoute allow={["admin"]}><ManageEvents /></ProtectedRoute>} />
-      <Route path="/admin/locations" element={<ProtectedRoute allow={["admin"]}><ManageLocations /></ProtectedRoute>} />
+       <Route path="/admin/notifications" element={<ProtectedRoute allow={["admin"]}><ManageNotifications /></ProtectedRoute>} />
+       <Route path="/admin/events" element={<ProtectedRoute allow={["admin"]}><ManageEvents /></ProtectedRoute>} />
+       <Route path="/admin/locations" element={<ProtectedRoute allow={["admin"]}><ManageLocations /></ProtectedRoute>} />
+       <Route path="/admin/qr-generator" element={<ProtectedRoute allow={["admin"]}><QRGenerator /></ProtectedRoute>} />
+       <Route path="/admin/users" element={<ProtectedRoute allow={["admin"]}><ManageUsers /></ProtectedRoute>} />
+       <Route path="/admin/activity" element={<ProtectedRoute allow={["admin"]}><ActivityLog /></ProtectedRoute>} />
 
       <Route path="/profile" element={<ProtectedRoute allow={["student","faculty","admin"]}><Profile /></ProtectedRoute>} />
       <Route path="/settings" element={<ProtectedRoute allow={["student","faculty","admin"]}><Settings /></ProtectedRoute>} />

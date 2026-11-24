@@ -89,6 +89,18 @@ export default function AppLayout({ children, title, subtitle, hideBottomNav = f
     { label: "AI Guide", path: "/chat", icon: "spark" },
   ];
 
+  const adminMenu = [
+    { label: "Dashboard", path: "/admin", icon: "home" },
+    { label: "Manage Classrooms", path: "/admin/classrooms", icon: "map" },
+    { label: "Manage Timetable", path: "/admin/timetable", icon: "calendar" },
+    { label: "Manage Notifications", path: "/admin/notifications", icon: "alert" },
+    { label: "Manage Events", path: "/admin/events", icon: "spark" },
+    { label: "Manage Locations", path: "/admin/locations", icon: "pin" },
+    { label: "QR Generator", path: "/admin/qr-generator", icon: "qrScanner" },
+    { label: "User Management", path: "/admin/users", icon: "users" },
+    { label: "Activity Log", path: "/admin/activity", icon: "clock" },
+  ];
+
   const bottomTabs = [
     { label: "My Class", path: role === "faculty" ? "/faculty/timetable" : "/student/timetable", icon: "myclass" },
     { label: "Explore Map", path: "/map", icon: "exploreMap" },
@@ -131,7 +143,7 @@ export default function AppLayout({ children, title, subtitle, hideBottomNav = f
         )}
 
         <nav className="cg-drawer-nav">
-          {menu.map((item) => (
+          {(role === "admin" ? adminMenu : menu).map((item) => (
             <Link key={item.label} to={item.path} className={`cg-drawer-item ${isActive(item.path) ? "active" : ""}`}>
               <span className="cg-drawer-icon"><Icon name={item.icon} /></span>
               <span>{item.label}</span>

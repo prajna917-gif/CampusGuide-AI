@@ -4,12 +4,21 @@ import AdminLayout from "../components/AdminLayout";
 import { getDashboardStats, getClassrooms } from "../services/classroomService";
 import { getScanStats } from "../services/scanLogService";
 
+const FLOOR_ROOM_COLORS = {
+  Classroom: "#2563eb",
+  Lab: "#7c3aed",
+  Office: "#f59e0b",
+  "Seminar Hall": "#ec4899",
+  "Staff Room": "#10b981",
+};
+
 const QUICK_ACTIONS = [
-  { label: "Add Room", desc: "Register new room, lab or office", icon: "plus", color: "icon-blue", href: "/admin/classrooms/new" },
+  { label: "Add Room", desc: "Register new room, lab or office", icon: "plus", color: "icon-blue", href: "/admin/classrooms" },
   { label: "Users", desc: "Manage students, faculty & admins", icon: "users", color: "icon-green", href: "/admin/users" },
   { label: "Timetable", desc: "Create & manage class schedules", icon: "calendar", color: "icon-amber", href: "/admin/timetable" },
   { label: "Notifications", desc: "Create & send notifications", icon: "bell", color: "icon-purple", href: "/admin/notifications" },
-  { label: "Events", desc: "Manage campus events", icon: "star", color: "icon-pink", href: "/admin/events" },
+  { label: "QR Generator", desc: "Generate & print room QR codes", icon: "spark", color: "icon-pink", href: "/admin/qr-generator" },
+  { label: "Activity Log", desc: "View recent platform activity", icon: "clock", color: "icon-blue", href: "/admin/activity" },
 ];
 
 const RECENT_CHANGES = [
@@ -110,6 +119,52 @@ export default function AdminDashboard() {
           <div className="stat-content">
             <span className="stat-label">Timetables</span>
             <span className="stat-number">{stats.totalTimetables}</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Campus Map Preview */}
+      <div className="dashboard-section">
+        <div className="section-header-flex">
+          <h2 className="section-title">Campus Map</h2>
+          <Link to="/map" className="view-all-link">Full Map →</Link>
+        </div>
+        <div className="admin-campus-map">
+          {recentRooms.length > 0 ? (
+            <div className="admin-map-floors">
+              {[1, 2, 3].map((floor) => {
+                const floorRooms = recentRooms.filter((r) => Number(r.floor) === floor);
+                if (floorRooms.length === 0) return null;
+                return (
+                  <div key={floor} className="admin-map-floor">
+                    <span className="admin-map-floor-label">Floor {floor}</span>
+                    <div className="admin-map-rooms">
+                      {floorRooms.map((room) => (
+                        <div
+                          key={room.id}
+                          className="admin-map-room"
+                          style={{ borderLeftColor: FLOOR_ROOM_COLORS[room.type] || "#94a3b8" }}
+                          title={`${room.type} · ${room.capacity || 60} seats`}
+                        >
+                          <span className="admin-map-room-num">{room.room_number}</span>
+                          <span className="admin-map-room-type">{room.type}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          ) : (
+            <p className="muted">No rooms to display. Add rooms in Manage Classrooms.</p>
+          )}
+          <div className="admin-map-legend">
+            {Object.entries(FLOOR_ROOM_COLORS).map(([type, color]) => (
+              <span key={type} className="admin-map-legend-item">
+                <span className="admin-map-legend-dot" style={{ background: color }} />
+                {type}
+              </span>
+            ))}
           </div>
         </div>
       </div>
