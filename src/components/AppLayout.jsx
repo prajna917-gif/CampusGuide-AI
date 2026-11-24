@@ -1,8 +1,9 @@
-﻿import { useState, useEffect } from "react";
+﻿import { useState, useEffect, useRef } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import InstallPwaPrompt from "./InstallPwaPrompt";
 import { getUnreadCount } from "../services/notificationService";
+import QRScannerPage from "../pages/QRScanner";
 
 const Icon = ({ name, size = 22 }) => {
   const p = { width: size, height: size, viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: "1.8", strokeLinecap: "round", strokeLinejoin: "round" };
@@ -29,6 +30,7 @@ const Icon = ({ name, size = 22 }) => {
     bookmark: <svg {...p}><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>,
     compass: <svg {...p}><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>,
     myclass: <svg {...p}><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>,
+    qrcode: <svg {...p}><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="3" height="3"/><rect x="18" y="14" width="3" height="3"/><rect x="14" y="18" width="3" height="3"/><rect x="18" y="18" width="3" height="3"/></svg>,
   };
   return icons[name] || null;
 };
@@ -41,6 +43,7 @@ export default function AppLayout({ children, title, subtitle, hideBottomNav = f
   const [activityOpen, setActivityOpen] = useState(false);
   const [viewAs, setViewAs] = useState(profile?.role || "student");
   const [unread, setUnread] = useState(0);
+  const [showQRScanner, setShowQRScanner] = useState(false);
 
   const role = profile?.role || "student";
   const allowedRoles = role === "admin" ? ["student", "faculty", "admin"] : role === "faculty" ? ["student", "faculty"] : ["student"];
@@ -68,10 +71,19 @@ export default function AppLayout({ children, title, subtitle, hideBottomNav = f
   const bottomTabs = [
     { label: "My Class", path: role === "faculty" ? "/faculty/timetable" : "/student/timetable", icon: "myclass" },
     { label: "Explore Map", path: "/map", icon: "compass" },
+    { label: "QR Scanner", action: "qr-scanner", icon: "qrcode" },
     { label: "Saved", path: "/saved", icon: "bookmark" },
   ];
 
   const isActive = (p) => location.pathname === p;
+
+  const handleBottomTab = (tab) => {
+    if (tab.action === "qr-scanner") {
+      setShowQRScanner(true);
+      return;
+    }
+    if (tab.path) navigate(tab.path);
+  };
 
   return (
     <div className="cg-shell">
@@ -83,7 +95,7 @@ export default function AppLayout({ children, title, subtitle, hideBottomNav = f
         </div>
 
         <div className="cg-viewas-card">
-          <div className="cg-viewas-label">You're viewing as</div>
+          <div className="cg-viewas-label">You&apos;re viewing as</div>
           <div className="cg-select-wrap">
             <select value={viewAs} onChange={(e) => setViewAs(e.target.value)} className="cg-select">
               {allowedRoles.map((r) => <option key={r} value={r}>{r.charAt(0).toUpperCase() + r.slice(1)}</option>)}
@@ -163,12 +175,25 @@ export default function AppLayout({ children, title, subtitle, hideBottomNav = f
         {!hideBottomNav && (
           <nav className="cg-bottom-nav">
             {bottomTabs.map((t) => (
-              <Link key={t.label} to={t.path} className={`cg-bottom-item ${isActive(t.path) ? "active" : ""}`}>
+              <button
+                key={t.label}
+                className={`cg-bottom-item ${t.path && isActive(t.path) ? "active" : ""}`}
+                onClick={() => handleBottomTab(t)}
+              >
                 <span className="cg-bottom-icon"><Icon name={t.icon} size={20} /></span>
                 <span>{t.label}</span>
-              </Link>
+              </button>
             ))}
           </nav>
+        )}
+
+        {showQRScanner && (
+          <QRScannerPage onClose={() => setShowQRScanner(false)} onScanned={(locationId) => {
+            setShowQRScanner(false);
+            if (locationId) {
+              navigate(`/find-classroom?dest=${locationId}`);
+            }
+          }} />
         )}
       </div>
     </div>

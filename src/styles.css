@@ -8178,3 +8178,53 @@ a { color: var(--cg-blue); text-decoration: none; }
 @media (max-width: 480px) {
   .cg-grid-2x2 { grid-template-columns: 1fr; }
 }
+
+/* ============================================================
+   QR SCANNER MODAL
+   ============================================================ */
+.cg-qr-overlay {
+  position: fixed; inset: 0; z-index: 200;
+  background: rgba(15, 23, 42, 0.8);
+  display: flex; align-items: center; justify-content: center;
+  padding: 16px;
+}
+.cg-qr-modal {
+  width: 100%; max-width: 360px;
+  background: #fff; border-radius: 20px; overflow: hidden;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+  animation: cg-slide-up 0.25s ease;
+}
+@keyframes cg-slide-up {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.cg-qr-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px; border-bottom: 1px solid var(--cg-border);
+}
+.cg-qr-header h3 { margin: 0; font-size: 1.1rem; font-weight: 700; }
+.cg-qr-close {
+  width: 32px; height: 32px; border-radius: 50%; border: 0; background: #F1F5F9;
+  color: #475569; font-size: 1rem; cursor: pointer; display: inline-flex; align-items: center; justify-content: center;
+}
+.cg-qr-close:hover { background: #E2E8F0; color: var(--cg-text); }
+.cg-qr-body { position: relative; padding: 16px; }
+.cg-qr-video { width: 100%; aspect-ratio: 1; border-radius: 14px; background: #000; object-fit: cover; }
+.cg-qr-frame {
+  position: absolute; top: 16px; left: 50%; transform: translateX(-50%);
+  width: 70%; aspect-ratio: 1; max-width: 200px;
+  border: 2px solid var(--cg-blue); border-radius: 12px;
+  box-shadow: 0 0 0 9999px rgba(0,0,0,0.5);
+  pointer-events: none;
+}
+.cg-qr-hint { margin: 12px 0 0; text-align: center; font-size: 0.8rem; color: #64748b; }
+.cg-qr-error { text-align: center; padding: 20px; }
+.cg-qr-error p { margin: 0 0 12px; color: #475569; }
+.cg-btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 12px 20px; border-radius: 12px; font-weight: 600; font-size: 0.9rem; cursor: pointer; border: 0; }
+.cg-btn-primary { background: var(--cg-blue); color: #fff; }
+.cg-btn-primary:hover { background: var(--cg-blue-dark); }
+
+/* Bottom nav 4 items adjustment */
+.cg-bottom-nav { padding: 0 4px; }
+.cg-bottom-item { padding: 8px 4px; gap: 2px; }
+.cg-bottom-item span { font-size: 0.65rem; }
