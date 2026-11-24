@@ -20,14 +20,17 @@ create table if not exists public.chat_messages (
 alter table public.chat_messages enable row level security;
 
 -- Users may only ever see their own conversation.
+drop policy if exists "users read own messages" on public.chat_messages;
 create policy "users read own messages" on public.chat_messages
   for select using (auth.uid() = user_id);
 
 -- Users may only insert a message attributed to themselves.
+drop policy if exists "users insert own messages" on public.chat_messages;
 create policy "users insert own messages" on public.chat_messages
   for insert with check (auth.uid() = user_id);
 
 -- "Clear chat" deletes only the caller's own rows.
+drop policy if exists "users delete own messages" on public.chat_messages;
 create policy "users delete own messages" on public.chat_messages
   for delete using (auth.uid() = user_id);
 
