@@ -55,6 +55,28 @@ Open http://localhost:5173
 - Row Level Security lets each user read only their own profile (admins can read all),
   and nobody can change their own role.
 
+## AI Assistant (free setup)
+
+The AI chat calls a Supabase Edge Function `ai-chat`, which proxies to any
+OpenAI-compatible API. Use a **free** provider such as [Groq](https://console.groq.com)
+(no billing required).
+
+1. Create a free Groq key at https://console.groq.com/keys (starts with `gsk_`).
+2. Set the Edge Function secrets (Supabase -> Project Settings -> Edge Functions,
+   or the CLI):
+   ```
+   supabase secrets set OPENAI_API_KEY=gsk_your_key
+   supabase secrets set OPENAI_BASE_URL=https://api.groq.com/openai/v1
+   supabase secrets set OPENAI_MODEL=llama-3.3-70b-versatile
+   ```
+3. Deploy the function:
+   ```
+   supabase functions deploy ai-chat
+   ```
+4. Sign in to the app (non-demo account) and open the AI Guide — it now answers.
+
+The AI key never reaches the browser; it lives only as an Edge Function secret.
+
 ## Create the Admin account
 
 1. Sign up in the app as a student.

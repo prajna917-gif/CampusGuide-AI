@@ -1,12 +1,19 @@
 // CampusGuide AI Assistant — Supabase Edge Function
 //
-// Proxies chat requests to the OpenAI API. The OpenAI key lives in a
-// Supabase secret (never in the browser), and every request is tied to
+// Proxies chat requests to an OpenAI-compatible chat API. Works with a
+// free provider (Groq, OpenRouter, etc.) or OpenAI itself. The key lives in
+// a Supabase secret (never in the browser), and every request is tied to
 // the logged-in user via their JWT.
 //
 // Deploy:   supabase functions deploy ai-chat
-// Secrets:  supabase secrets set OPENAI_API_KEY=sk-...
+// Secrets:  supabase secrets set OPENAI_API_KEY=...
 // Optional: supabase secrets set OPENAI_MODEL=gpt-4o-mini
+//           supabase secrets set OPENAI_BASE_URL=https://api.openai.com/v1
+//
+// Free Groq example:
+//   supabase secrets set OPENAI_API_KEY=gsk_...
+//   supabase secrets set OPENAI_BASE_URL=https://api.groq.com/openai/v1
+//   supabase secrets set OPENAI_MODEL=llama-3.3-70b-versatile
 
 import { createClient } from "jsr:@supabase/supabase-js@2";
 
@@ -125,14 +132,17 @@ Deno.serve(async (req) => {
     );
   }
 
-  const aiRes = await fetch("https://api.openai.com/v1/chat/completions", {
+  const baseUrl = (Deno.env.get("OPENAI_BASE_URL") || "https://api.openai.com/v1").replace(/\/+$/, "");
+  const model = Deno.env.get("OPENAI_MODEL") || "gpt-4o-mini";
+
+  const aiRes = await fetch(`${baseUrl}/chat/completions`, {
     method: "POST",
     headers: {
       Authorization: `Bearer ${openaiKey}`,
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      model: Deno.env.get("OPENAI_MODEL") || "gpt-4o-mini",
+      model,
       messages,
       max_tokens: 600,
       temperature: 0.4,
@@ -141,7 +151,7 @@ Deno.serve(async (req) => {
 
   if (!aiRes.ok) {
     const detail = await aiRes.text();
-    console.error("OpenAI error", aiRes.status, detail);
+    console.error("AI provider error", aiRes.status, detail);
     return jsonResponse(
       { error: "The AI service returned an error. Please try again." },
       502,
