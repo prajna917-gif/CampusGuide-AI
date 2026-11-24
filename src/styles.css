@@ -8322,3 +8322,131 @@ a { color: var(--cg-blue); text-decoration: none; }
 .cg-bottom-item { flex: 1; padding: 10px 4px; gap: 4px; }
 .cg-bottom-item span { font-size: 0.68rem; font-weight: 600; }
 .cg-bottom-icon { display: inline-flex; }
+
+/* ============================================================
+   BOTTOM NAV — NEW CLEAN DESIGN
+   ============================================================ */
+.cg-bottom-nav-new {
+  position: fixed;
+  left: 50%;
+  bottom: 20px;
+  transform: translateX(-50%);
+  width: calc(100% - 32px);
+  max-width: 420px;
+  height: 68px;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: saturate(180%) blur(20px);
+  border-radius: 34px;
+  box-shadow: 0 8px 32px rgba(15, 23, 42, 0.12), 0 2px 8px rgba(15, 23, 42, 0.08);
+  border: 1px solid rgba(226, 232, 240, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  padding: 0 8px;
+  z-index: 50;
+}
+
+.cg-bottom-item-new {
+  flex: 1;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  color: #64748b;
+  font-size: 0.68rem;
+  font-weight: 500;
+  border-radius: 28px;
+  padding: 8px 12px;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  position: relative;
+  transition: all 0.2s ease;
+}
+
+.cg-bottom-item-new:hover {
+  color: var(--cg-blue);
+  background: rgba(10, 102, 224, 0.06);
+}
+
+.cg-bottom-item-new.active {
+  color: var(--cg-blue);
+  background: linear-gradient(135deg, rgba(10, 102, 224, 0.12) 0%, rgba(10, 102, 224, 0.06) 100%);
+}
+
+.cg-bottom-item-new.active .cg-bottom-icon-new {
+  color: var(--cg-blue);
+}
+
+.cg-bottom-icon-new {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  color: inherit;
+  transition: all 0.2s ease;
+}
+
+.cg-bottom-item-new.active .cg-bottom-icon-new {
+  transform: scale(1.05);
+}
+
+.cg-bottom-label-new {
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+.cg-bottom-indicator {
+  position: absolute;
+  top: 6px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--cg-blue);
+  opacity: 0;
+  animation: cg-indicator-pop 0.2s ease forwards;
+}
+
+@keyframes cg-indicator-pop {
+  0% { opacity: 0; transform: translateX(-50%) scale(0.5); }
+  100% { opacity: 1; transform: translateX(-50%) scale(1); }
+}
+
+/* Active tab gets a subtle pill highlight */
+.cg-bottom-item-new.active::before {
+  content: "";
+  position: absolute;
+  inset: 4px;
+  border-radius: 24px;
+  background: linear-gradient(135deg, rgba(10, 102, 224, 0.08) 0%, transparent 100%);
+  pointer-events: none;
+}
+
+/* Content padding for bottom nav */
+.cg-content.has-bottom-nav {
+  padding-bottom: 110px;
+}
+
+/* Mobile adjustments */
+@media (max-width: 380px) {
+  .cg-bottom-nav-new {
+    width: calc(100% - 16px);
+    bottom: 12px;
+    height: 60px;
+    border-radius: 30px;
+  }
+  .cg-bottom-label-new { font-size: 0.6rem; }
+  .cg-bottom-icon-new { width: 24px; height: 24px; }
+}
+@media (min-width: 768px) {
+  .cg-bottom-nav-new {
+    max-width: 520px;
+  }
+}
