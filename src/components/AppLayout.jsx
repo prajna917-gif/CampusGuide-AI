@@ -30,22 +30,136 @@ const Icon = ({ name, size = 22 }) => {
     bookmark: <svg {...p}><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>,
     compass: <svg {...p}><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>,
     myclass: <svg {...p}><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>,
-    qrcode: <svg {...p}>
-      {/* Corner brackets - viewfinder corners */}
-      <path d="M5 3h6M5 3v6" strokeWidth="2.5"/>
-      <path d="M19 3h-6M19 3v6" strokeWidth="2.5"/>
-      <path d="M5 21h6M5 21v-6" strokeWidth="2.5"/>
-      <path d="M19 21h-6M19 21v-6" strokeWidth="2.5"/>
-      {/* QR pattern - three finder patterns */}
-      <rect x="6" y="6" width="5" height="5" fill="currentColor" stroke="currentColor" strokeWidth="1"/>
-      <rect x="13" y="6" width="5" height="5" fill="currentColor" stroke="currentColor" strokeWidth="1"/>
-      <rect x="6" y="13" width="5" height="5" fill="currentColor" stroke="currentColor" strokeWidth="1"/>
-      {/* Inner dots */}
-      <rect x="7.5" y="7.5" width="2" height="2" fill="none"/>
-      <rect x="14.5" y="7.5" width="2" height="2" fill="none"/>
-      <rect x="7.5" y="14.5" width="2" height="2" fill="none"/>
-      {/* Center timing pattern dots */}
-      <circle cx="12" cy="12" r="1.5" fill="currentColor"/>
+    // QR Code icons for bottom nav - all three use QR code base with distinguishing marks
+    qrMyClass: <svg {...p} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+      {/* Quiet zone background */}
+      <rect x="2" y="2" width="20" height="20" rx="2" fill="currentColor" fillOpacity="0.1"/>
+      {/* Finder pattern TL (7x7 black, 5x5 white, 3x3 black) */}
+      <rect x="3" y="3" width="7" height="7" fill="currentColor"/>
+      <rect x="4" y="4" width="5" height="5" fill="none" stroke="currentColor" strokeWidth="1"/>
+      <rect x="5.5" y="5.5" width="2" height="2" fill="currentColor"/>
+      {/* Finder pattern TR */}
+      <rect x="14" y="3" width="7" height="7" fill="currentColor"/>
+      <rect x="15" y="4" width="5" height="5" fill="none" stroke="currentColor" strokeWidth="1"/>
+      <rect x="16.5" y="5.5" width="2" height="2" fill="currentColor"/>
+      {/* Finder pattern BL */}
+      <rect x="3" y="14" width="7" height="7" fill="currentColor"/>
+      <rect x="4" y="15" width="5" height="5" fill="none" stroke="currentColor" strokeWidth="1"/>
+      <rect x="5.5" y="16.5" width="2" height="2" fill="currentColor"/>
+      {/* Timing patterns - horizontal and vertical */}
+      <g stroke="currentColor" strokeWidth="0.8" strokeDasharray="1.5 1.5">
+        <line x1="10.5" y1="5" x2="13.5" y2="5"/> {/* horizontal between finders */}
+        <line x1="5" y1="10.5" x2="5" y2="13.5"/> {/* vertical between finders */}
+      </g>
+      {/* Alignment pattern (bottom right area) - small 5x5 */}
+      <rect x="15" y="15" width="5" height="5" fill="none" stroke="currentColor" strokeWidth="1"/>
+      <rect x="16" y="16" width="3" height="3" fill="none" stroke="currentColor" strokeWidth="0.8"/>
+      <circle cx="17.5" cy="17.5" r="0.8" fill="currentColor"/>
+      {/* Data modules - scattered dots representing data */}
+      <g fill="currentColor" opacity="0.6">
+        <rect x="10.5" y="7" width="1.2" height="1.2"/>
+        <rect x="12.5" y="7" width="1.2" height="1.2"/>
+        <rect x="11" y="9" width="1.2" height="1.2"/>
+        <rect x="13" y="9" width="1.2" height="1.2"/>
+        <rect x="10.5" y="11" width="1.2" height="1.2"/>
+        <rect x="7" y="10.5" width="1.2" height="1.2"/>
+        <rect x="9" y="12.5" width="1.2" height="1.2"/>
+        <rect x="7" y="14" width="1.2" height="1.2"/>
+        <rect x="9" y="15.5" width="1.2" height="1.2"/>
+      </g>
+      {/* Format info strips - small marks near finders */}
+      <g stroke="currentColor" strokeWidth="0.8" opacity="0.5">
+        <line x1="3" y1="10.5" x2="3" y2="10.5"/> {/* near TL */}
+        <line x1="10.5" y1="3" x2="10.5" y2="3"/> {/* near TL top */}
+      </g>
+      {/* My Class distinguishing mark - small book/class icon in center-right */}
+      <path d="M17 8h4v8h-4z M17 8v8" stroke="currentColor" strokeWidth="1.2" fill="none"/>
+    </svg>,
+    qrMap: <svg {...p} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+      {/* Quiet zone background */}
+      <rect x="2" y="2" width="20" height="20" rx="2" fill="currentColor" fillOpacity="0.1"/>
+      {/* Finder pattern TL */}
+      <rect x="3" y="3" width="7" height="7" fill="currentColor"/>
+      <rect x="4" y="4" width="5" height="5" fill="none" stroke="currentColor" strokeWidth="1"/>
+      <rect x="5.5" y="5.5" width="2" height="2" fill="currentColor"/>
+      {/* Finder pattern TR */}
+      <rect x="14" y="3" width="7" height="7" fill="currentColor"/>
+      <rect x="15" y="4" width="5" height="5" fill="none" stroke="currentColor" strokeWidth="1"/>
+      <rect x="16.5" y="5.5" width="2" height="2" fill="currentColor"/>
+      {/* Finder pattern BL */}
+      <rect x="3" y="14" width="7" height="7" fill="currentColor"/>
+      <rect x="4" y="15" width="5" height="5" fill="none" stroke="currentColor" strokeWidth="1"/>
+      <rect x="5.5" y="16.5" width="2" height="2" fill="currentColor"/>
+      {/* Timing patterns */}
+      <g stroke="currentColor" strokeWidth="0.8" strokeDasharray="1.5 1.5">
+        <line x1="10.5" y1="5" x2="13.5" y2="5"/>
+        <line x1="5" y1="10.5" x2="5" y2="13.5"/>
+      </g>
+      {/* Alignment pattern */}
+      <rect x="15" y="15" width="5" height="5" fill="none" stroke="currentColor" strokeWidth="1"/>
+      <rect x="16" y="16" width="3" height="3" fill="none" stroke="currentColor" strokeWidth="0.8"/>
+      <circle cx="17.5" cy="17.5" r="0.8" fill="currentColor"/>
+      {/* Data modules */}
+      <g fill="currentColor" opacity="0.6">
+        <rect x="10.5" y="7" width="1.2" height="1.2"/>
+        <rect x="12.5" y="7" width="1.2" height="1.2"/>
+        <rect x="11" y="9" width="1.2" height="1.2"/>
+        <rect x="13" y="9" width="1.2" height="1.2"/>
+        <rect x="10.5" y="11" width="1.2" height="1.2"/>
+        <rect x="7" y="10.5" width="1.2" height="1.2"/>
+        <rect x="9" y="12.5" width="1.2" height="1.2"/>
+        <rect x="7" y="14" width="1.2" height="1.2"/>
+        <rect x="9" y="15.5" width="1.2" height="1.2"/>
+      </g>
+      {/* Map distinguishing mark - compass needle in center */}
+      <circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" strokeWidth="1.2"/>
+      <path d="M12 8v4l1.5 1.5" stroke="currentColor" strokeWidth="1.2" fill="none"/>
+      <path d="M12 12l-1 -1" stroke="currentColor" strokeWidth="1" fill="none"/>
+    </svg>,
+    qrScanner: <svg {...p} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+      {/* Quiet zone background */}
+      <rect x="2" y="2" width="20" height="20" rx="2" fill="currentColor" fillOpacity="0.1"/>
+      {/* Finder pattern TL */}
+      <rect x="3" y="3" width="7" height="7" fill="currentColor"/>
+      <rect x="4" y="4" width="5" height="5" fill="none" stroke="currentColor" strokeWidth="1"/>
+      <rect x="5.5" y="5.5" width="2" height="2" fill="currentColor"/>
+      {/* Finder pattern TR */}
+      <rect x="14" y="3" width="7" height="7" fill="currentColor"/>
+      <rect x="15" y="4" width="5" height="5" fill="none" stroke="currentColor" strokeWidth="1"/>
+      <rect x="16.5" y="5.5" width="2" height="2" fill="currentColor"/>
+      {/* Finder pattern BL */}
+      <rect x="3" y="14" width="7" height="7" fill="currentColor"/>
+      <rect x="4" y="15" width="5" height="5" fill="none" stroke="currentColor" strokeWidth="1"/>
+      <rect x="5.5" y="16.5" width="2" height="2" fill="currentColor"/>
+      {/* Timing patterns */}
+      <g stroke="currentColor" strokeWidth="0.8" strokeDasharray="1.5 1.5">
+        <line x1="10.5" y1="5" x2="13.5" y2="5"/>
+        <line x1="5" y1="10.5" x2="5" y2="13.5"/>
+      </g>
+      {/* Alignment pattern */}
+      <rect x="15" y="15" width="5" height="5" fill="none" stroke="currentColor" strokeWidth="1"/>
+      <rect x="16" y="16" width="3" height="3" fill="none" stroke="currentColor" strokeWidth="0.8"/>
+      <circle cx="17.5" cy="17.5" r="0.8" fill="currentColor"/>
+      {/* Data modules */}
+      <g fill="currentColor" opacity="0.6">
+        <rect x="10.5" y="7" width="1.2" height="1.2"/>
+        <rect x="12.5" y="7" width="1.2" height="1.2"/>
+        <rect x="11" y="9" width="1.2" height="1.2"/>
+        <rect x="13" y="9" width="1.2" height="1.2"/>
+        <rect x="10.5" y="11" width="1.2" height="1.2"/>
+        <rect x="7" y="10.5" width="1.2" height="1.2"/>
+        <rect x="9" y="12.5" width="1.2" height="1.2"/>
+        <rect x="7" y="14" width="1.2" height="1.2"/>
+        <rect x="9" y="15.5" width="1.2" height="1.2"/>
+      </g>
+      {/* Scanner distinguishing mark - viewfinder corners overlay */}
+      <g stroke="currentColor" strokeWidth="2" fill="none">
+        <path d="M5 5h4M5 5v4"/> {/* TL viewfinder */}
+        <path d="M19 5h-4M19 5v4"/> {/* TR viewfinder */}
+        <path d="M5 19h4M5 19v-4"/> {/* BL viewfinder */}
+      </g>
+      {/* Center scan line */}
+      <line x1="12" y1="7" x2="12" y2="17" stroke="currentColor" strokeWidth="1.5" strokeDasharray="3 2" opacity="0.7"/>
     </svg>,
   };
   return icons[name] || null;
@@ -85,9 +199,9 @@ export default function AppLayout({ children, title, subtitle, hideBottomNav = f
   ];
 
   const bottomTabs = [
-    { label: "My Class", path: role === "faculty" ? "/faculty/timetable" : "/student/timetable", icon: "myclass" },
-    { label: "Explore Map", path: "/map", icon: "compass" },
-    { label: "QR Scanner", action: "qr-scanner", icon: "qrcode" },
+    { label: "My Class", path: role === "faculty" ? "/faculty/timetable" : "/student/timetable", icon: "qrMyClass" },
+    { label: "Explore Map", path: "/map", icon: "qrMap" },
+    { label: "QR Scanner", action: "qr-scanner", icon: "qrScanner" },
   ];
 
   const isActive = (p) => location.pathname === p;
@@ -195,7 +309,7 @@ export default function AppLayout({ children, title, subtitle, hideBottomNav = f
                 className={`cg-bottom-item ${t.path && isActive(t.path) ? "active" : ""}`}
                 onClick={() => handleBottomTab(t)}
               >
-                <span className="cg-bottom-icon"><Icon name={t.icon} size={22} /></span>
+                <span className="cg-bottom-icon"><Icon name={t.icon} size={24} /></span>
                 <span>{t.label}</span>
               </button>
             ))}
